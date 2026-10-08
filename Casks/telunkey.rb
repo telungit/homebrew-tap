@@ -11,6 +11,7 @@ cask "telunkey" do
   depends_on macos: :sonoma
 
   app "TelunKey.app"
+  uninstall quit: "com.telunkey.TelunKey"
 
   # 当前发行包尚未经过 Apple 公证，仅移除本次安装应用的隔离标记。
   postflight_steps do

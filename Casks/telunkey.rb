@@ -12,9 +12,11 @@ cask "telunkey" do
 
   preflight_steps do
     run "/usr/bin/osascript",
-        args:         ["-e", 'tell application id "com.telunkey.TelunKey" to quit'],
+        args:         ["-e", 'if application id "com.telunkey.TelunKey" is running then tell application id "com.telunkey.TelunKey" to quit'],
         must_succeed: false
-    terminate_process "TelunKey", match: :name, attempts: 3, must_succeed: false
+    run "/bin/sh",
+        args:         ["-c", 'killall TelunKey 2>/dev/null || true'],
+        must_succeed: false
   end
 
   app "TelunKey.app"

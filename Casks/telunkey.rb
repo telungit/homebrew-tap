@@ -10,6 +10,12 @@ cask "telunkey" do
   auto_updates true
   depends_on macos: :sonoma
 
+  preflight_steps do
+    run "/usr/bin/osascript",
+        args:         ["-e", 'tell application id "com.telunkey.TelunKey" to quit'],
+        must_succeed: false
+  end
+
   app "TelunKey.app"
   uninstall quit: "com.telunkey.TelunKey"
 

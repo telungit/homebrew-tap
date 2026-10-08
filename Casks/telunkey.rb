@@ -1,6 +1,6 @@
 cask "telunkey" do
-  version "2.0.3"
-  sha256 "0dec75d32c11cf74382a52dc8ad462034bb0de9fb036c549a83ae639fe7b5bb5"
+  version "2.0.4"
+  sha256 "89dbb23e8c47ea474c6a1bc3865f481cb75dc9120e13fe00006956862a969889"
 
   url "https://github.com/telungit/TelunKey/releases/download/v#{version}/TelunKey.dmg"
   name "TelunKey"
@@ -14,6 +14,7 @@ cask "telunkey" do
     run "/usr/bin/osascript",
         args:         ["-e", 'tell application id "com.telunkey.TelunKey" to quit'],
         must_succeed: false
+    terminate_process "TelunKey", match: :name, attempts: 3, must_succeed: false
   end
 
   app "TelunKey.app"
@@ -28,7 +29,7 @@ cask "telunkey" do
   end
 
   caveats <<~EOS
-    当前发行包尚未经过 Apple 公证；安装时会自动移除 TelunKey.app 的隔离标记。
-    首次运行需要授予辅助功能权限；窗口缩略图另需屏幕录制权限。
+    首次运行需在“系统设置”中授予“辅助功能”权限；
+    如需窗口实时缩略图，另需授予“屏幕录制”权限（可选）。
   EOS
 end

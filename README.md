@@ -50,9 +50,11 @@ brew uninstall --cask telungit/tap/telunkey
 ## 维护发行版本
 
 1. 按既有流程将正式 DMG 与 `.sha256` 发布到 `telungit/TelunKey` 的公开 Release，不向 tap 或源码仓库提交 DMG。
-2. 在本 tap 目录运行更新脚本。默认读取最新正式 Release，也可以显式指定版本：
+2. 在 Homebrew 已克隆的 tap 目录运行更新脚本。默认读取最新正式 Release，也可以显式指定版本：
 
 ```bash
+cd "$(brew --repository telungit/tap)"
+git pull --ff-only
 python3 Tools/update_cask.py
 python3 Tools/update_cask.py --tag v2.0.1
 ```
@@ -63,7 +65,7 @@ python3 Tools/update_cask.py --tag v2.0.1
 
 ```bash
 ruby -c Casks/telunkey.rb
-brew style --cask Casks/telunkey.rb
+brew style --cask telungit/tap/telunkey
 git diff --check
 git diff -- Casks/telunkey.rb
 ```

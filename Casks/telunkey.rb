@@ -15,9 +15,9 @@ cask "telunkey" do
   # 当前发行包尚未经过 Apple 公证，仅移除本次安装应用的隔离标记。
   postflight_steps do
     run "/usr/bin/xattr",
-        args: ["-dr", "com.apple.quarantine", "{{appdir}}/TelunKey.app"],
+        args:           ["-dr", "com.apple.quarantine", "{{appdir}}/TelunKey.app"],
         writable_paths: ["TelunKey.app"],
-        writable_base: :appdir
+        writable_base:  :appdir
   end
 
   caveats <<~EOS

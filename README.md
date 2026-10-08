@@ -19,13 +19,15 @@ brew install --cask telungit/tap/telunkey
 
 ## 从手动安装迁移
 
-先退出 TelunKey。如果“应用程序”已有完全相同的发行包，可以尝试接管：
+先退出 TelunKey。若“应用程序”已有手动安装的 `TelunKey.app`，先将它移到其他文件夹备份，再执行普通安装命令。Homebrew 默认会拒绝覆盖已有应用；移动应用不会清空用户配置。
+
+如果只想让 Homebrew 接管现有应用、保留当前应用内容，也可以使用：
 
 ```bash
 brew install --cask --adopt telungit/tap/telunkey
 ```
 
-如果提示现有应用与安装包不一致，先将原 `TelunKey.app` 移到其他文件夹备份，再执行普通安装命令。配置保存在用户目录，移动应用不会清空配置。
+`--adopt` 不是更新命令。由于配方声明了 `auto_updates true`，Homebrew 接管时可能保留不同版本的现有应用，并按配方版本登记安装记录；接管成功不代表应用已升级。实际版本以 TelunKey 的“关于”窗口为准。要确保安装配方指定的版本，使用上面的备份后普通安装流程。
 
 ## 更新与卸载
 
@@ -36,7 +38,7 @@ brew update
 brew upgrade --cask --greedy telungit/tap/telunkey
 ```
 
-配方声明了 `auto_updates true`，因此手动使用 Homebrew 更新时需要 `--greedy`。
+配方声明了 `auto_updates true`；这里显式使用 `--greedy`，确保 Homebrew 按 tap 配方执行更新。应用内更新与 tap 配方分别维护，如果应用内已经更新到比 tap 更高的版本，应等待配方同步后再通过 Homebrew 更新，避免被替换为 tap 中的旧版本。
 
 重新安装或卸载：
 
@@ -56,10 +58,11 @@ brew uninstall --cask telungit/tap/telunkey
 cd "$(brew --repository telungit/tap)"
 git pull --ff-only
 python3 Tools/update_cask.py
-python3 Tools/update_cask.py --tag v2.0.1
 ```
 
-脚本实际下载 DMG，计算 SHA-256，并与 GitHub 资产摘要及发布的校验文件交叉校验；所有检查通过后才修改配方的版本和摘要。Release 必须使用 `v<版本号>` 标签并包含 `TelunKey.dmg`。
+也可以将最后一条命令替换为 `python3 Tools/update_cask.py --tag v<目标版本号>`，只运行其中一种同步方式。
+
+脚本实际下载 DMG，计算 SHA-256，并与 GitHub 资产摘要及发布的校验文件交叉校验；所有检查通过后才修改配方的版本和摘要。脚本拒绝回退版本或替换同一版本的 DMG 摘要。Release 必须使用 `v<版本号>` 标签并包含 `TelunKey.dmg` 与 `TelunKey.dmg.sha256`。
 
 3. 检查 DMG 中应用版本、最低系统版本和 CPU 架构与配方声明一致。审查配方差异并验证：
 

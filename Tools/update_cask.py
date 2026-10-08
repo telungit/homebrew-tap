@@ -32,6 +32,13 @@ def release_asset(release, name, tag):
 
 
 def update(tag):
+    original = CASK_PATH.read_text(encoding="utf-8")
+    versions = re.findall(r'^  version "([0-9]+(?:\.[0-9]+){1,3})"$', original, flags=re.M)
+    hashes = re.findall(r'^  sha256 "([0-9a-f]{64})"$', original, flags=re.M)
+    if len(versions) != 1 or len(hashes) != 1:
+        raise ValueError("配方中必须存在唯一的固定版本和 SHA-256")
+    current_version = versions[0]
+    current_checksum = hashes[0]
     if tag and not re.fullmatch(TAG_PATTERN, tag):
         raise ValueError("标签必须使用 v<版本号> 格式，例如 v2.0.1")
     endpoint = f"tags/{tag}" if tag else "latest"
@@ -44,6 +51,11 @@ def update(tag):
     if not match or (tag and tag != released_tag):
         raise ValueError("Release 标签格式或版本与请求不一致")
     version = match.group(1)
+    # 补齐版本分段后比较，避免将 2.0.10 误判为早于 2.0.9。
+    release_parts = tuple(map(int, version.split(".")))
+    current_parts = tuple(map(int, current_version.split(".")))
+    if release_parts + (0,) * (4 - len(release_parts)) < current_parts + (0,) * (4 - len(current_parts)):
+        raise ValueError(f"拒绝将配方从 {current_version} 回退到 {version}")
     asset = release_asset(release, "TelunKey.dmg", released_tag)
 
     digest = hashlib.sha256()
@@ -55,6 +67,8 @@ def update(tag):
     if size == 0 or size != asset["size"]:
         raise ValueError("DMG 下载大小与 Release 资产不一致")
     checksum = digest.hexdigest()
+    if version == current_version and checksum != current_checksum:
+        raise ValueError("同一版本的 DMG 已发生变化，请发布新版本后再同步")
     if asset.get("digest") and asset["digest"] != f"sha256:{checksum}":
         raise ValueError("DMG 的 SHA-256 与 GitHub 资产摘要不一致")
 
@@ -65,7 +79,6 @@ def update(tag):
     if not published_checksum or published_checksum.group(1).lower() != checksum:
         raise ValueError("DMG 的 SHA-256 与发布的校验文件不一致")
 
-    original = CASK_PATH.read_text(encoding="utf-8")
     updated, versions = re.subn(r'^  version "[^"\n]+"$', f'  version "{version}"', original, flags=re.M)
     updated, hashes = re.subn(r'^  sha256 "[0-9a-f]{64}"$', f'  sha256 "{checksum}"', updated, flags=re.M)
     if versions != 1 or hashes != 1:

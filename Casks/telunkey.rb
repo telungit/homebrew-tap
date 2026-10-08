@@ -11,27 +11,27 @@ cask "telunkey" do
   depends_on macos: :sonoma
 
   preflight_steps do
-    run "/usr/bin/osascript",
-        args:         ["-e", 'if application id "com.telunkey.TelunKey" is running then tell application id "com.telunkey.TelunKey" to quit'],
-        must_succeed: false
-    run "/bin/sh",
-        args:         ["-c", 'killall TelunKey 2>/dev/null || true'],
+    run "/usr/bin/pkill",
+        args:         ["-x", "TelunKey"],
         must_succeed: false
   end
 
   app "TelunKey.app"
   uninstall quit: "com.telunkey.TelunKey"
 
-  # 当前发行包尚未经过 Apple 公证，仅移除本次安装应用的隔离标记。
-  postflight_steps do
-    run "/usr/bin/xattr",
-        args:           ["-dr", "com.apple.quarantine", "{{appdir}}/TelunKey.app"],
-        writable_paths: ["TelunKey.app"],
-        writable_base:  :appdir
+  # 当前发行包尚未经过 Apple 公证，仅移除隔离标记并自动启动应用。
+  postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-dr", "com.apple.quarantine", "#{appdir}/TelunKey.app"]
+    system_command "/usr/bin/open",
+                   args: ["-a", "#{appdir}/TelunKey.app"]
   end
 
   caveats <<~EOS
-    首次运行需在“系统设置”中授予“辅助功能”权限；
-    如需窗口实时缩略图，另需授予“屏幕录制”权限（可选）。
+    On first launch, grant Accessibility permission in System Settings:
+      System Settings > Privacy & Security > Accessibility
+
+    Screen Recording permission is optional, required only for real-time window thumbnails:
+      System Settings > Privacy & Security > Screen Recording
   EOS
 end

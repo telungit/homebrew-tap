@@ -1,6 +1,6 @@
 cask "telunkey" do
-  version "2.0.1"
-  sha256 "7e66c9e78edf2149d2aca9650b9233263e2647521a82cd436d2ad0b1a98fc919"
+  version "2.0.2"
+  sha256 "d9a3ccffd8bf825023ef50c4716c9a2ebc895d21bf939c6df718727cf2808281"
 
   url "https://github.com/telungit/TelunKey/releases/download/v#{version}/TelunKey.dmg"
   name "TelunKey"

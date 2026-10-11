@@ -20,11 +20,12 @@ cask "telunkey" do
   uninstall quit: "com.telunkey.TelunKey"
 
   # 当前发行包尚未经过 Apple 公证，仅移除隔离标记并自动启动应用。
-  postflight do
-    system_command "/usr/bin/xattr",
-                   args: ["-dr", "com.apple.quarantine", "#{appdir}/TelunKey.app"]
-    system_command "/usr/bin/open",
-                   args: ["-a", "#{appdir}/TelunKey.app"]
+  # 步骤块在 InstallSteps DSL 上下文中求值，路径改用 {{appdir}} 模板令牌展开。
+  postflight_steps do
+    run "/usr/bin/xattr",
+        args: ["-dr", "com.apple.quarantine", "{{appdir}}/TelunKey.app"]
+    run "/usr/bin/open",
+        args: ["-a", "{{appdir}}/TelunKey.app"]
   end
 
   caveats <<~EOS

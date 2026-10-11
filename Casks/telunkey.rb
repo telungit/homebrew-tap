@@ -10,14 +10,13 @@ cask "telunkey" do
   auto_updates true
   depends_on macos: :sonoma
 
+  app "TelunKey.app"
+
   preflight_steps do
     run "/usr/bin/pkill",
         args:         ["-x", "TelunKey"],
         must_succeed: false
   end
-
-  app "TelunKey.app"
-  uninstall quit: "com.telunkey.TelunKey"
 
   # 当前发行包尚未经过 Apple 公证，仅移除隔离标记并自动启动应用。
   # 步骤块在 InstallSteps DSL 上下文中求值，路径改用 {{appdir}} 模板令牌展开。
@@ -27,6 +26,8 @@ cask "telunkey" do
     run "/usr/bin/open",
         args: ["-a", "{{appdir}}/TelunKey.app"]
   end
+
+  uninstall quit: "com.telunkey.TelunKey"
 
   caveats <<~EOS
     On first launch, grant Accessibility permission in System Settings:

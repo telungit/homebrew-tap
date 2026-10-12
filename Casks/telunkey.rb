@@ -4,7 +4,7 @@ cask "telunkey" do
 
   url "https://github.com/telungit/TelunKey/releases/download/v#{version}/TelunKey.dmg"
   name "TelunKey"
-  desc "全局快捷键应用启动与窗口切换工具"
+  desc "Global hotkey launcher and window switcher"
   homepage "https://github.com/telungit/TelunKey"
 
   auto_updates true

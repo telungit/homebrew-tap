@@ -23,8 +23,11 @@ cask "telunkey" do
   postflight_steps do
     run "/usr/bin/xattr",
         args: ["-dr", "com.apple.quarantine", "{{appdir}}/TelunKey.app"]
+    # 换包瞬间 Launch Services 可能仍在解析刚被移除的旧路径，open 会以
+    # kLSUnknownErr(-10810) 失败；自动启动只是体验优化，不允许因此回滚已完成的安装。
     run "/usr/bin/open",
-        args: ["-a", "{{appdir}}/TelunKey.app"]
+        args:         ["-a", "{{appdir}}/TelunKey.app"],
+        must_succeed: false
   end
 
   uninstall quit: "com.telunkey.TelunKey"

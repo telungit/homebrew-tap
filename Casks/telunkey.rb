@@ -18,16 +18,13 @@ cask "telunkey" do
         must_succeed: false
   end
 
-  # 当前发行包尚未经过 Apple 公证，仅移除隔离标记并自动启动应用。
+  # 当前发行包尚未经过 Apple 公证，仅移除隔离标记。
   # 步骤块在 InstallSteps DSL 上下文中求值，路径改用 {{appdir}} 模板令牌展开。
+  # 步骤在沙箱内执行，无法连接 LaunchServices，因此不在此处自动启动应用；
+  # 升级时由 Homebrew 自身的 "Reopening application(s) closed during upgrade" 负责拉起。
   postflight_steps do
     run "/usr/bin/xattr",
         args: ["-dr", "com.apple.quarantine", "{{appdir}}/TelunKey.app"]
-    # 换包瞬间 Launch Services 可能仍在解析刚被移除的旧路径，open 会以
-    # kLSUnknownErr(-10810) 失败；自动启动只是体验优化，不允许因此回滚已完成的安装。
-    run "/usr/bin/open",
-        args:         ["-a", "{{appdir}}/TelunKey.app"],
-        must_succeed: false
   end
 
   uninstall quit: "com.telunkey.TelunKey"

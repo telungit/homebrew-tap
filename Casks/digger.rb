@@ -1,0 +1,34 @@
+cask "digger" do
+  version "0.1.0"
+  sha256 "9a0a0edce80e0eac2ed0b31173334929a688b8903aca12bbced9718847abc500"
+
+  url "https://github.com/telungit/Digger/releases/download/v#{version}/Digger.dmg"
+  name "Digger"
+  desc "Native file workspace with multiple panes, floating files and search"
+  homepage "https://github.com/telungit/Digger"
+
+  auto_updates true
+  depends_on arch: :arm64
+  depends_on macos: :sequoia
+
+  app "Digger.app"
+
+  # Do not kill an active file operation during a Homebrew upgrade.
+  preflight_steps do
+    run "/bin/sh",
+        args: ["-c", "if /usr/bin/pgrep -f '(^|/)Digger[.]app/Contents/MacOS/Digger($| )' >/dev/null; then echo 'Quit Digger after file tasks finish, then retry.' >&2; exit 1; fi"]
+  end
+
+  postflight_steps do
+    run "/usr/bin/xattr",
+        args: ["-dr", "com.apple.quarantine", "{{appdir}}/Digger.app"]
+  end
+
+  uninstall quit: "io.github.telungit.Digger"
+
+  caveats <<~EOS
+    Open Digger to complete the optional permission guide.
+    Updates are available in the Digger menu or with:
+      brew upgrade --cask --greedy telungit/tap/digger
+  EOS
+end

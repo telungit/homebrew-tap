@@ -1,6 +1,6 @@
 cask "digger" do
-  version "0.1.0"
-  sha256 "9a0a0edce80e0eac2ed0b31173334929a688b8903aca12bbced9718847abc500"
+  version "0.1.1"
+  sha256 "76e54bfeb324458e33787c273ef3f3770430aa9aee71094cfe2d7c3171a3ba50"
 
   url "https://github.com/telungit/Digger/releases/download/v#{version}/Digger.dmg"
   name "Digger"
